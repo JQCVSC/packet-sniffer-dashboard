@@ -5,24 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Packet Sniffer Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #4CAF50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #packetData {
+            background-color: #2e2e2e;
+            border: 1px solid #3e3e3e;
+            border-radius: 5px;
+            padding: 20px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #4CAF50;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-    <h1>Packet Sniffer Dashboard</h1>
-    <button onclick="getPackets('all')">All Packets</button>
-    <button onclick="getPackets('rebex')">Rebex</button>
-    <button onclick="getPackets('dns')">DNS Queries</button>
-    <button onclick="getPackets('jsonplaceholder')">JSONPlaceholder</button>
-    <pre id="packetData"></pre>
+    <div class="container">
+        <h1>Packet Sniffer Dashboard</h1>
+        <div class="button-group">
+            <button onclick="getPackets('all')">All Packets</button>
+            <button onclick="getPackets('rebex')">Rebex</button>
+            <button onclick="getPackets('dns')">DNS Queries</button>
+            <button onclick="getPackets('jsonplaceholder')">JSONPlaceholder</button>
+        </div>
+        <div class="loader" id="loader"></div>
+        <pre id="packetData"></pre>
+    </div>
 
     <script>
         function getPackets(source) {
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('packetData').textContent = '';
             let url = source === 'all' ? '/packets' : `/packets/${source}`;
             axios.get(url)
                 .then(function (response) {
                     document.getElementById('packetData').textContent = JSON.stringify(response.data, null, 2);
+                    document.getElementById('loader').style.display = 'none';
                 })
                 .catch(function (error) {
                     console.error('Error fetching packets:', error);
+                    document.getElementById('packetData').textContent = 'Error fetching packets';
+                    document.getElementById('loader').style.display = 'none';
                 });
         }
         

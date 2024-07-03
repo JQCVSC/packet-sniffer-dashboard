@@ -1,8 +1,11 @@
 from flask import Flask, jsonify, render_template
-from google.cloud import firestore
+from datetime import datetime
+import random
 
 app = Flask(__name__)
-db = firestore.Client()
+
+# Mock database
+mock_packets = []
 
 @app.route('/')
 def index():
@@ -10,22 +13,27 @@ def index():
 
 @app.route('/packets')
 def get_packets():
-    packets = db.collection('packets').order_by('timestamp', direction=firestore.Query.DESCENDING).limit(100).stream()
-    return jsonify([packet.to_dict() for packet in packets])
+    return jsonify(mock_packets)
 
 @app.route('/packets/<source>')
 def get_source_packets(source):
-    if source == 'rebex':
-        query = db.collection('packets').where('dst', '==', 'test.rebex.net').order_by('timestamp', direction=firestore.Query.DESCENDING).limit(50)
-    elif source == 'dns':
-        query = db.collection('packets').where('dport', '==', 53).order_by('timestamp', direction=firestore.Query.DESCENDING).limit(50)
-    elif source == 'jsonplaceholder':
-        query = db.collection('packets').where('dst', '==', 'jsonplaceholder.typicode.com').order_by('timestamp', direction=firestore.Query.DESCENDING).limit(50)
-    else:
-        return jsonify([])
-    
-    packets = query.stream()
-    return jsonify([packet.to_dict() for packet in packets])
+    return jsonify([p for p in mock_packets if p.get('source') == source])
+
+# Mock packet generation for testing
+def generate_mock_packet():
+    sources = ['rebex', 'dns', 'jsonplaceholder']
+    return {
+        "timestamp": datetime.now().isoformat(),
+        "source": random.choice(sources),
+        "src": f"192.168.0.{random.randint(1, 255)}",
+        "dst": f"10.0.0.{random.randint(1, 255)}",
+        "proto": random.choice(['TCP', 'UDP']),
+        "length": random.randint(64, 1500)
+    }
+
+# Generate some mock packets
+for _ in range(50):
+    mock_packets.append(generate_mock_packet())
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
