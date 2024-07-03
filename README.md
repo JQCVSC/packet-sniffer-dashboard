@@ -1,4 +1,3 @@
-# packet-sniffer-dashboard
 # Packet Sniffer Dashboard
 
 A cloud-based network packet sniffer with a web dashboard, deployed on Google Cloud Platform.
