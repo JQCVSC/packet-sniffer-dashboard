@@ -1,0 +1,24 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: google-github-actions/setup-gcloud@v0.2.0
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+    - run: |
+        gcloud auth configure-docker
+        docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/packet-sniffer-dashboard .
+        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/packet-sniffer-dashboard
+        gcloud run deploy packet-sniffer-dashboard \
+          --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/packet-sniffer-dashboard \
+          --platform managed \
+          --allow-unauthenticated \
+          --region us-central1
