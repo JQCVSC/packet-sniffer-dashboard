@@ -6,6 +6,21 @@ A cloud-based network packet sniffer with a web dashboard, deployed on Google Cl
 
 This project demonstrates a network packet sniffer with a web-based dashboard, designed for educational purposes and network analysis practice. It captures packets from various external sources and displays them in a user-friendly web interface, leveraging Google Cloud Platform for deployment and data storage.
 
+This is a demo version using mock data
+
+## Transitioning to Real GCP Integration
+
+To use this project with real Google Cloud Platform integration:
+
+1. Set up a GCP project and enable necessary APIs (Firestore, Cloud Run)
+2. Create a service account with appropriate permissions
+3. Download the service account key JSON file
+4. Modify the `app.py` file to use Firestore instead of mock data
+5. Update the Dockerfile to include your service account key
+6. Never commit your service account key to public repositories
+
+For detailed instructions on GCP setup, refer to the official Google Cloud documentation.
+
 ## Features
 
 - Captures network packets from multiple sources:
